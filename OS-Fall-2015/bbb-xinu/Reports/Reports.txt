@@ -1,0 +1,86 @@
+Assignment 2
+1. Yes, the program outputs garbage values. This is because of context switching between the producer and the consumer. When the waiting process resumes, this process runs from the previous state stored in the PCB. Hence the garbage values.
+
+2. Not all the values are getting consumed by the consumer. For a small count of value 8, the final value 8 is being printed by the consumer. Xinu does execute processes concurrently, Inspite of that, the producer runs to the end of its execution cycle before the consumer starts executing.
+
+Producer() - Srikanth - The Producer is the first process to run from the main. The job of the producer is to iterate through a loop for a user defined count or default count of 2000, initialise a value in incremental order to the shared buffer n and prints out the produced value.
+
+Consumer() - Vishwas - The consumer function iterates through a loop for a user defined count or default count of 2000, and prints the value of shared buffer/ global variable n.
+
+The main function and the header file were written collaboratively between the two.
+
+Assignment 3
+
+1. We use wait() and signal() functions provided by xinu. 
+  semcreate() intializes the semaphores. produced semaphore is initialised to 0 and consumed to 1.
+  So, Initially there is no block on the producer. Once the producer has finished running its critical section, it signals     the consumer by setting the value of the produced semaphore to 1.
+ Now, Since the produced semaphore is 1, the block on the consumer is removed. So, the consumer executes its critical section  and signals the producer once the execution is finished.
+ This switching between processes continues until it has reached it limit either as specified by the user or a default value  of 2000 and synchronisation is achieved.
+ 
+ 2. No, we need 2 semaphores.
+ 
+Suppose, we create 2 processes producer and consumer with a single sempahore S. Initialize S to 1, assume producer gets executed first.S is decremented to 0, Producer finishes the execution and now signals on S. At this instant S=1 and both processes wait on S, there are equal chances of either processes getting executed. As a result , producer can again get executed resulting into no synchronisation.
+
+void producer(int count,sid32 S)
+{
+  int i;
+  for(i=1;i<=count;i++)
+    {
+      wait(S);	
+      n=i;	
+      kprintf("produced : %d\n",n);
+      signal(S);
+    }
+}
+
+void consumer(int count,sid32 S)
+{     
+  int i;
+  for(i=1;i<=count;i++)
+    {
+      wait(S);
+      kprintf("consumed: %d \n",n);
+      signal(S);
+    }
+}
+
+
+Usually, a single sempahore is used when single same peice of code(critical section) with shared resources is exexcuted by multiple processes to gain lock on that piece of code. In that case mutex is used.
+ 
+Producer() - Srikanth - The Producer is the first process to run from the main. The job of the producer is to iterate through a loop for a user defined count or default count of 2000. Wait for the consumer to finish its execution, achieve the lock once signalled by the consumer. Initialise a value in incremental order to the shared buffer n and prints out the produced value. Then, it releases the lock and signals the consumer to resume.
+
+Consumer() - Vishwas - The consumer function iterates through a loop for a user defined count or default count of 2000. Wait for the producer to finish its execution, achieve the lock once signalled by the producer. Once the lock is achieved, it executes its critical section and prints the value of shared buffer/ global variable n. Then, it releases the lock and signals the producer to resume.
+
+The main function and the header file were written collaboratively between the two.
+
+Assignment 4
+
+future_get() and future_alloc() - Srikanth
+future_set() and future_free() - Vishwas
+main() collaborately worked, to build the main
+
+Functions used:
+future_alloc(): it allocates a new future (in the FUTURE_EMPTY state) in given mode. We will use getmem() call to allocate space to new future.
+future_free(): Free the allocated future. This function will simply free the space assigned to Future. Use freemem(). call to free the space.
+future_get(): Get the value of a future set by an operation and change the state of future from FUTURE_VALID to FUTURE_EMPTY.
+future_set(): Set a value in a future and changes state from FUTURE_EMPTY or FUTURE_WAITING to FUTURE_VALID.
+future_prod(): produces a random value for the consumer that is already created and waiting for the value to be produced.
+future_cons(): creates a consumer process, and it goes to sleep. the process is awaken only when the value is produced in the future.
+
+Assignment 5
+
+future_get(),enqueue() and future_alloc() - Vishwas
+future_set(), future_free()and dequeue() - Srikanth
+main()and queue.c collaborately worked, to build the main
+
+Functions used:
+future_alloc(): it allocates a new future (in the FUTURE_EMPTY state) in given mode. We will use getmem() call to allocate space to new future.
+future_free(): Free the allocated future. This function will simply free the space assigned to Future. Use freemem(). call to free the space.
+future_get(): Get the value of a future set by an operation and change the state of future from FUTURE_VALID to FUTURE_EMPTY.
+future_set(): Set a value in a future and changes state from FUTURE_EMPTY or FUTURE_WAITING to FUTURE_VALID.
+future_prod(): produces a random value for the consumer that is already created and waiting for the value to be produced.
+future_cons(): creates a consumer process, and it goes to sleep. the process is awaken only when the value is produced in the future.
+Enqueue() - The calling process suspends itself and uses enqueue() to enquque itself in the queue.
+Dequeue() - When a process is resumes, it is removed from the queue using the funtion Dequeue.
+Check_Thread() - returns the 1st suspended process's ID for resuming
+suspend() and resume() are used for synchronisation between futures
